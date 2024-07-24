@@ -19,7 +19,7 @@
   </style>
 </head>
 <body>
-  <h1>Data from Google Sheet</h1>
+  <h1>Data from Google Sheets</h1>
   
   <form id="filter-form">
     <label for="clock-number">Clock Number:</label>
@@ -50,8 +50,6 @@
               entry.classList.add('entry');
               const aadhaarCardUrl = convertGoogleDriveUrl(item.aadhaarCard);
               const panCardUrl = convertGoogleDriveUrl(item.panCard);
-              console.log('Aadhaar Card URL:', aadhaarCardUrl);
-              console.log('PAN Card URL:', panCardUrl);
               entry.innerHTML = `
                 <p>Clock Number: ${item.clockNumber}</p>
                 <p>Bio Data: <a href="${item.bioData}" target="_blank">Download</a></p>
@@ -68,6 +66,7 @@
     }
 
     function convertGoogleDriveUrl(url) {
+      // Extract file ID from URL and construct the view URL
       const fileIdMatch = url.match(/[-\w]{25,}/);
       return fileIdMatch ? `https://drive.google.com/uc?export=view&id=${fileIdMatch[0]}` : url;
     }
