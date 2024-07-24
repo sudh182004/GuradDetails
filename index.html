@@ -19,7 +19,7 @@
   </style>
 </head>
 <body>
-  <h1>Data from Google Sheets</h1>
+  <h1>Data from Google Sheet</h1>
   
   <form id="filter-form">
     <label for="clock-number">Clock Number:</label>
@@ -48,15 +48,15 @@
             data.forEach(item => {
               const entry = document.createElement('div');
               entry.classList.add('entry');
-              const aadhaarCardUrl = convertGoogleDriveUrl(item.aadhaarCard).replace('https:', 'http:');
-              const panCardUrl = convertGoogleDriveUrl(item.panCard).replace('https:', 'http:');
+              const aadhaarCardUrl = convertGoogleDriveUrl(item.aadhaarCard);
+              const panCardUrl = convertGoogleDriveUrl(item.panCard);
               console.log('Aadhaar Card URL:', aadhaarCardUrl);
               console.log('PAN Card URL:', panCardUrl);
               entry.innerHTML = `
                 <p>Clock Number: ${item.clockNumber}</p>
                 <p>Bio Data: <a href="${item.bioData}" target="_blank">Download</a></p>
-                <p>Aadhaar Card: <img src="${aadhaarCardUrl}" alt="Aadhaar Card" /></p>
-                <p>PAN Card: <img src="${panCardUrl}" alt="PAN Card" /></p>
+                <p>Aadhaar Card: <img src="${aadhaarCardUrl}" alt="Aadhaar Card" onerror="this.onerror=null;this.src='default-image.png';" /></p>
+                <p>PAN Card: <img src="${panCardUrl}" alt="PAN Card" onerror="this.onerror=null;this.src='default-image.png';" /></p>
               `;
               container.appendChild(entry);
             });
