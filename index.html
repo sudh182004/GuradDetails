@@ -19,7 +19,7 @@
   </style>
 </head>
 <body>
-  <h1>Data from Google Sheets</h1>
+  <h1>Data from Google Sheetss</h1>
   
   <form id="filter-form">
     <label for="clock-number">Clock Number:</label>
@@ -66,7 +66,6 @@
     }
 
     function convertGoogleDriveUrl(url) {
-      // Extract file ID from URL and construct the view URL
       const fileIdMatch = url.match(/[-\w]{25,}/);
       return fileIdMatch ? `https://drive.google.com/uc?export=view&id=${fileIdMatch[0]}` : url;
     }
