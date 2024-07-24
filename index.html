@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Display</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .entry {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .entry img {
+      max-width: 100px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Data from Google Sheets</h1>
+  
+  <form id="filter-form">
+    <label for="clock-number">Clock Number:</label>
+    <input type="text" id="clock-number" name="clockNumber" required>
+    <button type="submit">Get Data</button>
+  </form>
+  
+  <div id="data-container"></div>
+
+  <script>
+    document.getElementById('filter-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const clockNumber = document.getElementById('clock-number').value;
+      fetchData(clockNumber);
+    });
+
+    function fetchData(clockNumber) {
+      fetch(`https://script.google.com/macros/s/AKfycbzMmVQQdfEuvo4dFEb8vMwQrc1n9-nek9P5ZRT053If2S_ApsZV6r21zFgyljwWQTKq/exec?clockNumber=${clockNumber}`)
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('data-container');
+          container.innerHTML = ''; // Clear previous results
+          if (data.length === 0) {
+            container.innerHTML = '<p>No data found for the given clock number.</p>';
+          } else {
+            data.forEach(item => {
+              const entry = document.createElement('div');
+              entry.classList.add('entry');
+              const aadhaarCardUrl = convertGoogleDriveUrl(item.aadhaarCard).replace('https:', 'http:');
+              const panCardUrl = convertGoogleDriveUrl(item.panCard).replace('https:', 'http:');
+              console.log('Aadhaar Card URL:', aadhaarCardUrl);
+              console.log('PAN Card URL:', panCardUrl);
+              entry.innerHTML = `
+                <p>Clock Number: ${item.clockNumber}</p>
+                <p>Bio Data: <a href="${item.bioData}" target="_blank">Download</a></p>
+                <p>Aadhaar Card: <img src="${aadhaarCardUrl}" alt="Aadhaar Card" /></p>
+                <p>PAN Card: <img src="${panCardUrl}" alt="PAN Card" /></p>
+              `;
+              container.appendChild(entry);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    function convertGoogleDriveUrl(url) {
+      const fileIdMatch = url.match(/[-\w]{25,}/);
+      return fileIdMatch ? `https://drive.google.com/uc?export=view&id=${fileIdMatch[0]}` : url;
+    }
+  </script>
+</body>
+</html>
