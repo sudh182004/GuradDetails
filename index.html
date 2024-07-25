@@ -1,181 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Display</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Data</title>
+    <style>body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
     }
-    header {
-      background-color: #333;
-      color: #fff;
-      padding: 1rem;
-      text-align: center;
-    }
+    
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
     }
-    .entry {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1rem;
-      margin: 1rem 0;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      transition: background-color 0.3s ease;
+    
+    h1 {
+        margin-bottom: 20px;
     }
-    .entry:hover {
-      background-color: #f9f9f9;
+    
+    label {
+        display: block;
+        margin: 10px 0 5px;
     }
-    .entry p {
-      margin: 0.5rem 0;
+    
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
     }
-    .entry a {
-      color: #007bff;
-      text-decoration: none;
+    
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
     }
-    .entry a:hover {
-      text-decoration: underline;
+    
+    button:hover {
+        background-color: #0056b3;
     }
-    form {
-      background: #fff;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin: 1rem 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    
+    #responseMessage {
+        margin-top: 10px;
+        font-size: 14px;
     }
-    form input[type="number"] {
-      width: 100%;
-      max-width: 400px;
-      padding: 0.7rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-bottom: 0.5rem;
-    }
-    form button {
-      padding: 0.7rem 1.5rem;
-      margin-top: 1rem;
-      border: none;
-      border-radius: 8px;
-      background-color: #007bff;
-      color: #fff;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: background-color 0.3s ease;
-    }
-    form button:hover {
-      background-color: #0056b3;
-    }
-    .loading {
-      display: none;
-      text-align: center;
-      margin: 1rem 0;
-    }
-    .loading .spinner {
-      border: 8px solid #f3f3f3; /* Light grey */
-      border-top: 8px solid #007bff; /* Blue */
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    @media (min-width: 768px) {
-      form input[type="number"] {
-        width: calc(100% - 24px);
-      }
-      form button {
-        font-size: 1.2rem;
-      }
-    }
-    @media (min-width: 1024px) {
-      form input[type="number"] {
-        width: calc(100% - 26px);
-      }
-      form button {
-        font-size: 1.4rem;
-      }
-    }
-  </style>
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Guard Details</h1>
-  </header>
+    <div class="container">
+        <h1>Submit Data</h1>
+        <form id="dataForm">
+            <label for="clockNumber">Clock Number:</label>
+            <input type="text" id="clockNumber" name="clockNumber" required>
 
-  <div class="container">
-    <form id="filter-form">
-      <input type="number" id="clock-number" placeholder="Enter The Clock Number" required>
-      <button type="submit">Get Data</button>
-    </form>
-    
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <p>Loading...</p>
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+
+            <button type="submit">Submit</button>
+        </form>
+        <p id="responseMessage"></p>
     </div>
-    
-    <div id="data-container"></div>
-  </div>
-
-  <script>
-    document.getElementById('filter-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const clockNumber = document.getElementById('clock-number').value;
-      if (clockNumber.length > 6) {
-        alert(`${clockNumber} is not a correct clock number`);
-      } else {
-        showLoading(true);
-        fetchData(clockNumber);
-      }
-    });
-
-    function showLoading(isLoading) {
-      const loadingElement = document.getElementById('loading');
-      loadingElement.style.display = isLoading ? 'block' : 'none';
-    }
-
-    function fetchData(clockNumber) {
-      fetch(`https://script.google.com/macros/s/AKfycbzMmVQQdfEuvo4dFEb8vMwQrc1n9-nek9P5ZRT053If2S_ApsZV6r21zFgyljwWQTKq/exec?clockNumber=${clockNumber}`)
-        .then(response => response.json())
+    <script>document.getElementById('dataForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const clockNumber = document.getElementById('clockNumber').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        
+        const url = 'https://script.google.com/macros/s/AKfycbw1oRij38rrbS1MTC6XxmaQEXpTCkQ0_c3g5hTvhgglolkSCyarK6nlSPoLyjlfbOlVDA/exec';  // Replace with your Google Apps Script web app URL
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                clockNumber: clockNumber,
+                phoneNumber: phoneNumber
+            })
+        })
+        .then(response => response.text())
         .then(data => {
-          showLoading(false);
-          const container = document.getElementById('data-container');
-          container.innerHTML = ''; // Clear previous results
-          if (data.length === 0) {
-            container.innerHTML = '<p>No data found for the given clock number.</p>';
-          } else {
-            data.forEach(item => {
-              const entry = document.createElement('div');
-              entry.classList.add('entry');
-              entry.innerHTML = `
-                <p><b>Clock Number:</b> ${item.clockNumber}</p>
-                <p><b>Bio Data:</b> <a href="${item.bioData}" target="_blank">Download</a></p>
-                <p><b>Aadhaar Card:</b> <a href="${item.aadhaarCard}" target="_blank" download>Download Image</a></p>
-                <p><b>PAN Card:</b> <a href="${item.panCard}" target="_blank" download>Download Image</a></p>
-              `;
-              container.appendChild(entry);
-            });
-          }
+            document.getElementById('responseMessage').textContent = 'Data submitted successfully!';
         })
         .catch(error => {
-          showLoading(false);
-          console.error('Error fetching data:', error);
+            document.getElementById('responseMessage').textContent = 'Error submitting data.';
         });
-    }
-  </script>
+    });
+    </script>
 </body>
 </html>
