@@ -243,6 +243,7 @@
           const metadata = {
             name: file.name,
             mimeType: file.type,
+            parents: ['1m5L7WQVE5CotM_W0GzWZBnDL8vpPr02R']
           };
 
           const form = new FormData();
@@ -296,6 +297,10 @@
         if (!clockNumber) {
           alert("Clock Number is required.");
           return false;
+        }
+        if(clockNumber.length>6|| clockNumber.length<6){
+          alert("Enter 6 digit clock number only")
+          return
         }
 
         if (!profileImage) {
