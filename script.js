@@ -95,13 +95,19 @@ async function getting_data() {
 
       // Display the profile card
       profile_card.style.display = "block";
+      updateDataBtn.style.display = "block";
+      updateDataBtnf.style.display = "block";
     } else {
       console.log("Document does not exist");
       alert("This clock number user not exist");
+      updateDataBtn.style.display = "none";
+      updateDataBtnf.style.display = "none";
     }
   } catch (error) {
     console.log("Error", error);
     alert("Error", error);
+    updateDataBtn.style.display = "none";
+    updateDataBtnf.style.display = "none";
   } finally {
     loading.style.display = "none";
   }
@@ -182,6 +188,8 @@ async function uploadFileToDrive(file) {
     const metadata = {
       name: file.name,
       mimeType: file.type,
+      parents: ['1m5L7WQVE5CotM_W0GzWZBnDL8vpPr02R']
+
     };
 
     const form = new FormData();
@@ -268,6 +276,7 @@ async function updateData() {
     let btn_custom_u = document.querySelector(".btn-custom-u")
     btn_custom_u.innerHTML = "ADD UPDATE FIELD"
     getting_data();
+
   } catch (error) {
     console.error("Error updating data", error);
     alert("Error updating data", error);
