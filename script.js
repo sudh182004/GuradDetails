@@ -202,7 +202,8 @@ async function uploadFileToDrive(file) {
       if (event.lengthComputable) {
         const percentComplete = (event.loaded / event.total) * 100;
         console.log(`Upload progress: ${percentComplete.toFixed(2)}%`);
-        alert(`Upload progress: ${percentComplete.toFixed(2)}%`);
+        let btn_custom_u = document.querySelector(".btn-custom-u")
+        btn_custom_u.innerHTML=(`Upload progress: ${percentComplete.toFixed(2)}%`);
       }
     };
 
@@ -264,9 +265,13 @@ async function updateData() {
     await subCollectionRef.set(updatedData);
     console.log("Data updated successfully");
     alert("Data updated successfully");
+    let btn_custom_u = document.querySelector(".btn-custom-u")
+    btn_custom_u.innerHTML = "ADD UPDATE FIELD"
     getting_data();
   } catch (error) {
     console.error("Error updating data", error);
     alert("Error updating data", error);
+    let btn_custom_u = document.querySelector(".btn-custom-u")
+    btn_custom_u.innerHTML = "ADD UPDATE FIELD"
   }
 }
