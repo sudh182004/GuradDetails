@@ -263,6 +263,8 @@
             if (event.lengthComputable) {
               const percentComplete = (event.loaded / event.total) * 100;
               console.log(`Upload progress: ${percentComplete.toFixed(2)}%`);
+             let btn_custom = document.querySelector(".btn-custom")
+             btn_custom.innerHTML=(`Upload progress: ${percentComplete.toFixed(2)}%`)
             }
           };
 
