@@ -48,7 +48,8 @@
         padding: 20px;
       }
 
-      .btn-custom,.btn-custom-u {
+      .btn-custom,
+      .btn-custom-u {
         background: linear-gradient(to right, #007bff, #0056b3);
         color: #fff;
         border: none;
@@ -71,6 +72,12 @@
         font-size: 1.5rem;
         color: #007bff;
         margin-top: 20px;
+      }
+      button,
+      select {
+        margin-right: 6px;
+        text-transform: none;
+        padding: 8px;
       }
 
       .div_profile {
@@ -156,7 +163,6 @@
       .profile-card img {
         width: 100px;
         height: 100px;
-        border-radius: 50%;
         object-fit: cover;
         margin-bottom: 20px;
       }
@@ -310,11 +316,23 @@
       <div class="div_profile"></div>
       <div class="div_details"></div>
       <div class="profile-card"></div>
-      <button id= "updateDataBtn" style="display:none" class="btn btn-custom-u" onclick="addUpdateField()" >
+      <button
+        id="updateDataBtn"
+        style="display: none"
+        class="btn btn-custom-u"
+        onclick="addUpdateField()"
+      >
         Add Update Field
       </button>
       <div id="fieldsContainer"></div>
-      <button id= "updateDataBtnf" style="display:none" class="btn btn-custom-u" onclick="updateData()">Update Data</button>
+      <button
+        id="updateDataBtnf"
+        style="display: none"
+        class="btn btn-custom-u"
+        onclick="updateData()"
+      >
+        Update Data
+      </button>
     </div>
 
     <!-- script tag -->
