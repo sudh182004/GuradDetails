@@ -148,7 +148,20 @@ function addUpdateField() {
 
   const fieldDiv = document.createElement("div");
   fieldDiv.innerHTML = ` <div class="d-flex align-items-center">
-                    <input type="text" placeholder="Document Type" id="docType${fieldCount}" class="form-control me-2" />
+                   
+
+
+                    
+
+  <select name="Feild Name" id="docType${fieldCount}">
+  <option value="Choose ">Choose</option>
+  <option value="Aadhar Card">Aadhar Card</option>
+  <option value="Pan Card">Pan Card</option>
+  <option value="Bio Data">Bio Data</option>
+  <option value="Id Card">Id Card</option>
+  <option value="License">License</option>
+</select>
+
                     <input type="file" id="file${fieldCount}" class="form-control me-2" />
                     <button class="remove-btn" onclick="removeField(this)">Remove</button>
                 </div>`;
