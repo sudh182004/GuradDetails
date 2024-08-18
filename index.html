@@ -1,62 +1,67 @@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Google Fit Step Count</title>
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
-        <script src="https://apis.google.com/js/api.js"></script>
-    </head>
-    <body>
-        <button onclick="authenticate()">CLick me</button>
-        <script>
-            /**
-           * Sample JavaScript code for fitness.users.dataset.aggregate
-           * See instructions for running APIs Explorer code samples locally:
-           * https://developers.google.com/explorer-help/guides/code_samples#javascript
-           */
-        
-          function authenticate() {
-            return gapi.auth2.getAuthInstance()
-                .signIn({scope: "https://www.googleapis.com/auth/fitness.activity.read"})
-                .then(function() { console.log("Sign-in successful"); },
-                      function(err) { console.error("Error signing in", err); });
-          }
-          function loadClient() {
-            gapi.client.setApiKey("AIzaSyApfKMexFM6BYlXU5_soJtqM5gaXEmVXCk");
-            return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
-                .then(function() { console.log("GAPI client loaded for API"); },
-                      function(err) { console.error("Error loading GAPI client for API", err); });
-          }
-          // Make sure the client is loaded and sign-in is complete before calling this method.
-          function execute() {
-            return gapi.client.fitness.users.dataset.aggregate({
-              "userId": "me",
-              "resource": {
-                "aggregateBy": [
-                  {
-                    "dataTypeName": "com.google.step_count.delta",
-                    "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-                  }
-                ],
-                "endTimeMillis": 1561652514300,
-                "startTimeMillis": 1561228200000,
-                "bucketByTime": {
-                  "durationMillis": 86400000
-                }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Fit Step Count</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+    <button onclick="authenticate()">Click me</button>
+
+    <script>
+      function authenticate() {
+        return gapi.auth2.getAuthInstance()
+            .signIn({scope: "https://www.googleapis.com/auth/fitness.activity.read"})
+            .then(function() { console.log("Sign-in successful"); },
+                  function(err) { console.error("Error signing in", err); });
+      }
+
+      function loadClient() {
+        gapi.client.setApiKey("AIzaSyApfKMexFM6BYlXU5_soJtqM5gaXEmVXCk");
+        return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
+            .then(function() { console.log("GAPI client loaded for API"); },
+                  function(err) { console.error("Error loading GAPI client for API", err); });
+      }
+
+      function execute() {
+        return gapi.client.fitness.users.dataset.aggregate({
+          "userId": "me",
+          "resource": {
+            "aggregateBy": [
+              {
+                "dataTypeName": "com.google.step_count.delta",
+                "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
               }
-            })
-                .then(function(response) {
-                        // Handle the results here (response.result has the parsed body).
-                        console.log("Response", response);
-                      },
-                      function(err) { console.error("Execute error", err); });
+            ],
+            "endTimeMillis": 1561652514300,
+            "startTimeMillis": 1561228200000,
+            "bucketByTime": {
+              "durationMillis": 86400000
+            }
           }
-          gapi.load("client:auth2", function() {
-            gapi.auth2.init({client_id: "389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"});
-          });
-        </script>
-        <button onclick="authenticate().then(loadClient)">authorize and load</button>
-        <button onclick="execute()">execute</button>
-    </body>
-    </html>
+        })
+        .then(function(response) {
+                console.log("Response", response);
+              },
+              function(err) { console.error("Execute error", err); });
+      }
+
+      // Ensure the GAPI library is loaded before calling authenticate or loadClient
+      function initGapi() {
+        gapi.load("client:auth2", function() {
+          gapi.auth2.init({client_id: "389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"});
+        });
+      }
+
+      // Initialize GAPI when the page loads
+      window.onload = function() {
+        initGapi();
+      }
+    </script>
+
+    <button onclick="authenticate().then(loadClient)">Authorize and Load</button>
+    <button onclick="execute()">Execute</button>
+</body>
+</html>
