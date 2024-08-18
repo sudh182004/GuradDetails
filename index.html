@@ -9,7 +9,7 @@
 <body>
     <div>
         <h1>Your Google Fit Data Sources</h1>
-        <p id="data-sources">Loading...</p>
+        <pre id="data-sources">Loading...</pre>
         <div id="g_id_onload"
             data-client_id="389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"
             data-context="signin"
@@ -24,35 +24,36 @@
         function handleCredentialResponse(response) {
             const token = response.credential;
             if (token) {
-                fetchDataSources(token);
+                // fetchDataSources(token);
+                console.log(token);
             } else {
                 console.error('No token retrieved');
                 document.getElementById('data-sources').textContent = 'Error: No token retrieved';
             }
         }
 
-        function fetchDataSources(token) {
-            fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataSources', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('data-sources').textContent = JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                console.error('Error fetching data sources:', error);
-                document.getElementById('data-sources').textContent = 'Error fetching data sources';
-            });
-        }
+        // function fetchDataSources(token) {
+        //     fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataSources', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error(`HTTP error! status: ${response.status}`);
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         document.getElementById('data-sources').textContent = JSON.stringify(data, null, 2);
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching data sources:', error);
+        //         document.getElementById('data-sources').textContent = 'Error fetching data sources';
+        //     });
+        // }
     </script>
 </body>
 </html>
