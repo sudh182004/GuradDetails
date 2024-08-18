@@ -34,7 +34,7 @@
         }
 
         function fetchStepsData(token) {
-            fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
+            fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataSources', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
