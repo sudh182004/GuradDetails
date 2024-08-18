@@ -32,28 +32,33 @@
             }
         }
 
-        function fetchDataSources(token) {
-            fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataSources', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('data-sources').textContent = JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                console.error('Error fetching data sources:', error);
-                document.getElementById('data-sources').textContent = 'Error fetching data sources';
-            });
-        }
+        function fetchStepsData(token) {
+                fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "aggregateBy": [{
+                            "dataTypeName": "com.google.step_count.delta",
+                            "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+                        }],
+                        "bucketByTime": { "durationMillis": 86400000 }, // 1 day in milliseconds
+                        "startTimeMillis": new Date().setHours(0, 0, 0, 0), // Start of the day
+                        "endTimeMillis": new Date().getTime() // Current time
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const steps = data.bucket[0].dataset[0].point[0].value[0].intVal;
+                    document.getElementById('steps').textContent = `Total steps: ${steps}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching step data:', error);
+                    document.getElementById('steps').textContent = 'Error fetching step data';
+                });
+            }
     </script>
 </body>
 </html>
