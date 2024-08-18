@@ -8,60 +8,68 @@
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-    <button onclick="authenticate()">Click me</button>
+    <div id="g_id_onload"
+         data-client_id="YOUR_CLIENT_ID"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+
+    <button onclick="authenticate()">Authorize and Load</button>
 
     <script>
-      function authenticate() {
-        return gapi.auth2.getAuthInstance()
-            .signIn({scope: "https://www.googleapis.com/auth/fitness.activity.read"})
-            .then(function() { console.log("Sign-in successful"); },
-                  function(err) { console.error("Error signing in", err); });
-      }
+        function handleCredentialResponse(response) {
+            console.log('Encoded JWT ID token: ' + response.credential);
+            // You can send the ID token to your server for verification and further processing.
+        }
 
-      function loadClient() {
-        gapi.client.setApiKey("AIzaSyApfKMexFM6BYlXU5_soJtqM5gaXEmVXCk");
-        return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
-            .then(function() { console.log("GAPI client loaded for API"); },
-                  function(err) { console.error("Error loading GAPI client for API", err); });
-      }
+        function authenticate() {
+            google.accounts.oauth2.initTokenClient({
+                client_id: '389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com',
+                scope: 'https://www.googleapis.com/auth/fitness.activity.read',
+                callback: (tokenResponse) => {
+                    console.log('Access Token: ', tokenResponse.access_token);
+                    loadClient(tokenResponse.access_token);
+                }
+            }).requestAccessToken();
+        }
 
-      function execute() {
-        return gapi.client.fitness.users.dataset.aggregate({
-          "userId": "me",
-          "resource": {
-            "aggregateBy": [
-              {
-                "dataTypeName": "com.google.step_count.delta",
-                "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-              }
-            ],
-            "endTimeMillis": 1561652514300,
-            "startTimeMillis": 1561228200000,
-            "bucketByTime": {
-              "durationMillis": 86400000
-            }
-          }
-        })
-        .then(function(response) {
+        function loadClient(accessToken) {
+            gapi.client.setApiKey("AIzaSyApfKMexFM6BYlXU5_soJtqM5gaXEmVXCk");
+            gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
+                .then(function() { 
+                    console.log("GAPI client loaded for API");
+                    execute(accessToken);
+                },
+                function(err) { 
+                    console.error("Error loading GAPI client for API", err); 
+                });
+        }
+
+        function execute(accessToken) {
+            gapi.client.fitness.users.dataset.aggregate({
+                "userId": "me",
+                "resource": {
+                    "aggregateBy": [
+                        {
+                            "dataTypeName": "com.google.step_count.delta",
+                            "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+                        }
+                    ],
+                    "endTimeMillis": 1561652514300,
+                    "startTimeMillis": 1561228200000,
+                    "bucketByTime": {
+                        "durationMillis": 86400000
+                    }
+                }
+            })
+            .then(function(response) {
                 console.log("Response", response);
-              },
-              function(err) { console.error("Execute error", err); });
-      }
-
-      // Ensure the GAPI library is loaded before calling authenticate or loadClient
-      function initGapi() {
-        gapi.load("client:auth2", function() {
-          gapi.auth2.init({client_id: "389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"});
-        });
-      }
-
-      // Initialize GAPI when the page loads
-      window.onload = function() {
-        initGapi();
-      }
+            }, function(err) { 
+                console.error("Execute error", err); 
+            });
+        }
     </script>
-
-    <button onclick="authenticate().then(loadClient)">Authorize and Load</button>
-    <button onclick="execute()">Execute</button>
 </body>
 </html>
