@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,46 +11,43 @@
     <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-    <div id="g_id_onload"
-         data-client_id="389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"
-         data-context="signin"
-         data-ux_mode="popup"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
-    </div>
-
     <button onclick="authenticate()">Authorize and Load</button>
+    <button onclick="execute()">Execute</button>
 
     <script>
-        function handleCredentialResponse(response) {
-            console.log('Encoded JWT ID token: ' + response.credential);
-            // You can send the ID token to your server for verification and further processing.
-        }
+        let accessToken = '';
+        const endTimeMillis = Date.now(); // Current time in milliseconds
+        const startTimeMillis = endTimeMillis - (7 * 24 * 60 * 60 * 1000); // 7 days ago
 
         function authenticate() {
             google.accounts.oauth2.initTokenClient({
-                client_id: '389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com',
+                client_id: '389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com',  // Replace with your client ID
                 scope: 'https://www.googleapis.com/auth/fitness.activity.read',
                 callback: (tokenResponse) => {
-                    console.log('Access Token: ', tokenResponse.access_token);
-                    loadClient(tokenResponse.access_token);
+                    accessToken = tokenResponse.access_token;
+                    console.log('Access Token:', accessToken);
+                    loadClient();
                 }
             }).requestAccessToken();
         }
 
-        function loadClient(accessToken) {
-            gapi.client.setApiKey("AIzaSyApfKMexFM6BYlXU5_soJtqM5gaXEmVXCk");
-            gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
+        function loadClient() {
+            gapi.client.setApiKey("AIzaSyApfKMexFM6BYlXU5_soJtqM5gaXEmVXCk");  // Replace with your API key
+            return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
                 .then(function() { 
                     console.log("GAPI client loaded for API");
-                    execute(accessToken);
                 },
                 function(err) { 
                     console.error("Error loading GAPI client for API", err); 
                 });
         }
 
-        function execute(accessToken) {
+        function execute() {
+            if (!accessToken) {
+                console.error("Access token is missing. Please authorize first.");
+                return;
+            }
+
             gapi.client.fitness.users.dataset.aggregate({
                 "userId": "me",
                 "resource": {
@@ -57,19 +57,30 @@
                             "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
                         }
                     ],
-                    "endTimeMillis": 1561652514300,
-                    "startTimeMillis": 1561228200000,
+                    "startTimeMillis": startTimeMillis,
+                    "endTimeMillis": endTimeMillis,
                     "bucketByTime": {
-                        "durationMillis": 86400000
+                        "durationMillis": 86400000 // 1 day in milliseconds
                     }
                 }
             })
             .then(function(response) {
-                console.log("Response", response);
-            }, function(err) { 
-                console.error("Execute error", err); 
-            });
+                    console.log("Response", response);
+                    if (response.result.bucket && response.result.bucket.length > 0) {
+                        console.log("Data received: ", response.result.bucket);
+                        response.result.bucket.forEach(bucket => {
+                            const stepCount = bucket.dataset[0].point.reduce((sum, point) => sum + point.value[0].intVal, 0);
+                            console.log(`Steps on ${new Date(parseInt(bucket.startTimeMillis)).toDateString()}: ${stepCount}`);
+                        });
+                    } else {
+                        console.log("No data available for the given time range.");
+                    }
+                },
+                function(err) { 
+                    console.error("Execute error", err); 
+                });
         }
     </script>
 </body>
 </html>
+
