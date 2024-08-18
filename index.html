@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Fit Step Count</title>
+    <title>Google Fit Data Sources</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div>
-        <h1>Your Step Count</h1>
-        <p id="steps">Loading...</p>
-      
+        <h1>Your Google Fit Data Sources</h1>
+        <p id="data-sources">Loading...</p>
         <div id="g_id_onload"
-    data-client_id="389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"
-    data-context="signin"
-    data-ux_mode="popup"
-    data-callback="handleCredentialResponse"
-    data-scope="https://www.googleapis.com/auth/fitness.activity.read">
-</div>
-
+            data-client_id="YOUR_CLIENT_ID"
+            data-context="signin"
+            data-ux_mode="popup"
+            data-callback="handleCredentialResponse"
+            data-scope="https://www.googleapis.com/auth/fitness.realtime.read https://www.googleapis.com/auth/fitness.activity.read">
+        </div>
         <div class="g_id_signin" data-type="standard"></div>
     </div>
 
@@ -26,29 +24,20 @@
         function handleCredentialResponse(response) {
             const token = response.credential;
             if (token) {
-                fetchStepsData(token);
+                fetchDataSources(token);
             } else {
                 console.error('No token retrieved');
-                document.getElementById('steps').textContent = 'Error: No token retrieved';
+                document.getElementById('data-sources').textContent = 'Error: No token retrieved';
             }
         }
 
-        function fetchStepsData(token) {
+        function fetchDataSources(token) {
             fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataSources', {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "aggregateBy": [{
-                        "dataTypeName": "com.google.step_count.delta",
-                        "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-                    }],
-                    "bucketByTime": { "durationMillis": 86400000 }, // 1 day in milliseconds
-                    "startTimeMillis": new Date().setHours(0, 0, 0, 0), // Start of the day
-                    "endTimeMillis": new Date().getTime() // Current time
-                })
+                }
             })
             .then(response => {
                 if (!response.ok) {
@@ -57,16 +46,11 @@
                 return response.json();
             })
             .then(data => {
-                if (data.bucket && data.bucket[0] && data.bucket[0].dataset[0].point.length > 0 && data.bucket[0].dataset[0].point[0].value[0].intVal !== undefined) {
-                    const steps = data.bucket[0].dataset[0].point[0].value[0].intVal;
-                    document.getElementById('steps').textContent = `Total steps: ${steps}`;
-                } else {
-                    throw new Error('Invalid or missing data in API response');
-                }
+                document.getElementById('data-sources').textContent = JSON.stringify(data, null, 2);
             })
             .catch(error => {
-                console.error('Error fetching step data:', error);
-                document.getElementById('steps').textContent = 'Error fetching step data';
+                console.error('Error fetching data sources:', error);
+                document.getElementById('data-sources').textContent = 'Error fetching data sources';
             });
         }
     </script>
