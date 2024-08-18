@@ -24,7 +24,7 @@
         function handleCredentialResponse(response) {
             const token = response.credential;
             if (token) {
-                // fetchDataSources(token);
+                fetchDataSources(token);
                 console.log(token);
             } else {
                 console.error('No token retrieved');
@@ -32,28 +32,28 @@
             }
         }
 
-        // function fetchDataSources(token) {
-        //     fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataSources', {
-        //         method: 'GET',
-        //         headers: {
-        //             'Authorization': `Bearer ${token}`,
-        //             'Content-Type': 'application/json'
-        //         }
-        //     })
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error(`HTTP error! status: ${response.status}`);
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         document.getElementById('data-sources').textContent = JSON.stringify(data, null, 2);
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching data sources:', error);
-        //         document.getElementById('data-sources').textContent = 'Error fetching data sources';
-        //     });
-        // }
+        function fetchDataSources(token) {
+            fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataSources', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('data-sources').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Error fetching data sources:', error);
+                document.getElementById('data-sources').textContent = 'Error fetching data sources';
+            });
+        }
     </script>
 </body>
 </html>
