@@ -1,60 +1,72 @@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Google Fit Step Count</title>
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
-    </head>
-    <body>
-        <div>
-            <h1>Your Step Count</h1>
-            <p id="steps">Loading...</p>
-            <div id="g_id_onload"
-                data-client_id="389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"
-                data-context="signin"
-                data-ux_mode="popup"
-                data-login_uri="http://localhost:5501"
-                data-callback="handleCredentialResponse">
-            </div>
-            <div class="g_id_signin" data-type="standard"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Fit Step Count</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <div>
+        <h1>Your Step Count</h1>
+        <p id="steps">Loading...</p>
+        <div id="g_id_onload"
+            data-client_id="389074169622-1flijncf2phnpcf7somgmjejt272eubo.apps.googleusercontent.com"
+            data-context="signin"
+            data-ux_mode="popup"
+            data-callback="handleCredentialResponse"
+            data-scope="https://www.googleapis.com/auth/fitness.activity.read">
         </div>
+        <div class="g_id_signin" data-type="standard"></div>
+    </div>
 
-        <script>
-            function handleCredentialResponse(response) {
-                const token = response.credential;
-                // Use the token to call your backend or directly make API requests
+    <script>
+        function handleCredentialResponse(response) {
+            const token = response.credential;
+            if (token) {
                 fetchStepsData(token);
+            } else {
+                console.error('No token retrieved');
+                document.getElementById('steps').textContent = 'Error: No token retrieved';
             }
+        }
 
-            // Fetch the user's step count data using the token
-            function fetchStepsData(token) {
-                fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        "aggregateBy": [{
-                            "dataTypeName": "com.google.step_count.delta",
-                            "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-                        }],
-                        "bucketByTime": { "durationMillis": 86400000 }, // 1 day in milliseconds
-                        "startTimeMillis": new Date().setHours(0, 0, 0, 0), // Start of the day
-                        "endTimeMillis": new Date().getTime() // Current time
-                    })
+        function fetchStepsData(token) {
+            fetch('https://fitness.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "aggregateBy": [{
+                        "dataTypeName": "com.google.step_count.delta",
+                        "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+                    }],
+                    "bucketByTime": { "durationMillis": 86400000 }, // 1 day in milliseconds
+                    "startTimeMillis": new Date().setHours(0, 0, 0, 0), // Start of the day
+                    "endTimeMillis": new Date().getTime() // Current time
                 })
-                .then(response => response.json())
-                .then(data => {
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.bucket && data.bucket[0] && data.bucket[0].dataset[0].point.length > 0 && data.bucket[0].dataset[0].point[0].value[0].intVal !== undefined) {
                     const steps = data.bucket[0].dataset[0].point[0].value[0].intVal;
                     document.getElementById('steps').textContent = `Total steps: ${steps}`;
-                })
-                .catch(error => {
-                    console.error('Error fetching step data:', error);
-                    document.getElementById('steps').textContent = 'Error fetching step data';
-                });
-            }
-        </script>
-    </body>
-    </html>
+                } else {
+                    throw new Error('Invalid or missing data in API response');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching step data:', error);
+                document.getElementById('steps').textContent = 'Error fetching step data';
+            });
+        }
+    </script>
+</body>
+</html>
